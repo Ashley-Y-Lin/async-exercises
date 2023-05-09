@@ -7,32 +7,39 @@ const $cardArea = $("#cardsArea");
 const $getCardButton = $("#getCardButton");
 let DECK_ID;
 
-/** get one card and display its suit and value */
+/** returns id of a new shuffled deck of cards, called when page loads */
 async function begin() {
   DECK_ID = await shuffleCards();
-  console.log("deck", DECK_ID);
 }
 
-/** get a random card */
+/** get and display a random card, called when the $getCardButton is clicked */
 async function getOneCardAndDisplay() {
-  // evt.preventDefault();
+  console.log("deck", DECK_ID);
   const card = await getOneCard(DECK_ID);
   displayCard(card);
 }
 
+/** gets one card, returns array with object of card info */
 async function getOneCard(id) {
   const cardInfo = await axios.get(
     `${BASE_URL}/api/deck/${id}/draw/?count=${NUM_CARDS}`
   );
-  console.log("card retrieved =", cardInfo.data.cards[0]);
 
   return [cardInfo.data.cards[0]];
 }
 
-// function displayCard(card) {
-//   const $cardParagraph = $("<p>").text(`The value of the card is ${cardInfo[0].value} and the suit is ${cardInfo[0].suit}.`);
-//   $cardArea.append($cardParagraph);
-// }
+/** takes as input array of card info, displays the card image in the $cardArea */
+function displayCard(card) {
+  $cardArea.empty();
+
+  const cardImgURL = card[0].image;
+
+  const $cardImage = $("<img>").attr({
+    "src": cardImgURL,
+    "alt": "Image for newly drawn card"
+  });
+  $cardArea.append($cardImage);
+}
 
 /** shuffle a deck of cards and return the deck_id (string) */
 async function shuffleCards() {
@@ -42,6 +49,6 @@ async function shuffleCards() {
   return shuffled.data.deck_id;
 }
 
-$getCardButton.on("submit", getOneCardAndDisplay());
+$getCardButton.on("click", getOneCardAndDisplay);
 
 begin();
